@@ -11,7 +11,7 @@ dependencies = [
     "datasets==2.19.0",
     "mteb==1.7.4",
     "sentence-transformers==2.7.0",
-    "wandb==0.16.6",
+    "wandb>=0.17.0",
     "scikit-learn==1.4.2",
     "scipy==1.13.0",
     "numpy==1.26.4",

@@ -5,7 +5,7 @@ accelerate launch --config_file ./configs/ddp_config.yaml train.py \
 --output_dir output/$formatted_time/ \
 --model_name_or_path ../pretrained/MiniCPM-2B-dpo-bf16/ \
 --temperature 0.05 \
---train_data_path ../data/processed_pilot \
+--train_data_path ../data/processed \
 --learning_rate 5e-5 \
 --per_device_train_batch_size 7 \
 --bf16 \
