@@ -91,3 +91,36 @@ Results saved to `eval/mteb/results/minicpm/`.
 - LoRA targets `q_proj` and `v_proj` by default (rank 8, alpha 32, dropout 0.1).
 - In-batch negatives are combined with explicit hard negatives in the InfoNCE loss. `AllGather` enables using negatives across all GPUs for a larger effective batch.
 - Pretrained models are expected at `pretrained/` (gitignored). Trained adapters go to `train/output/` (also gitignored).
+
+## Remote Training Practices
+
+When running training or evaluation on a remote GPU instance (Lambda Cloud, etc.), always follow these conventions:
+
+1. **Always use `tmux`** — Every SSH session to a remote machine must start inside a `tmux` session so that long-running jobs survive disconnects.
+
+   ```bash
+   tmux new -s training
+   # or reattach: tmux attach -t training
+   ```
+
+2. **Always use `tee` for log capture** — Pipe stdout/stderr to a timestamped log file while still displaying output in the terminal.
+
+   ```bash
+   ./train.sh 2>&1 | tee train_$(date +%Y%m%d%H%M%S).log
+   ```
+
+3. **Always send a push notification on completion** — Append an `ntfy.sh` curl after every long-running command so the user gets notified on their iPhone.
+
+   ```bash
+   ./train.sh 2>&1 | tee train.log; \
+     curl -d "Training finished (exit code: $?)" ntfy.sh/ntfy.sh/LM-STS-CFT
+   ```
+
+When composing remote commands, combine all three:
+
+```bash
+tmux new -s training
+# then inside tmux:
+./train.sh 2>&1 | tee train_$(date +%Y%m%d%H%M%S).log; \
+  curl -d "Training finished (exit code: $?)" ntfy.sh/ntfy.sh/LM-STS-CFT
+```
