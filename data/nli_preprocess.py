@@ -1,9 +1,13 @@
+import argparse
+
 from datasets import load_dataset
 from transformers import AutoTokenizer
 
 class NLIPreprocess:
-    def __init__(self, path):
+    def __init__(self, path, num_rows=None):
         self.ds = load_dataset("csv", data_files=path)['train']
+        if num_rows is not None:
+            self.ds = self.ds.select(range(min(num_rows, len(self.ds))))
 
         tokenizer_path = '../pretrained/MiniCPM-2B-dpo-bf16/'
         self.tokenizer = AutoTokenizer.from_pretrained(tokenizer_path, local_files_only=True)
@@ -38,5 +42,13 @@ class NLIPreprocess:
                      "hard_neg_input_ids", "hard_neg_attention_mask",]
         )
 
-nlip = NLIPreprocess('nli_for_simcse.csv')
-nlip.ds.save_to_disk("./processed/")
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--num_rows", type=int, default=None,
+                        help="Use first N rows for a pilot dataset")
+    args = parser.parse_args()
+
+    nlip = NLIPreprocess('nli_for_simcse.csv', num_rows=args.num_rows)
+    out_dir = "./processed_pilot/" if args.num_rows else "./processed/"
+    nlip.ds.save_to_disk(out_dir)
+    print(f"Saved {len(nlip.ds)} examples to {out_dir}")

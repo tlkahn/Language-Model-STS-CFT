@@ -163,6 +163,7 @@ cython_debug/
 *.json
 *.csv
 processed/
+processed_pilot/
 
 # lightning logs
 lightning_logs/
