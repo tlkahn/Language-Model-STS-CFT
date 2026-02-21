@@ -59,11 +59,21 @@ cd train
 The train script uses `accelerate launch` with the DDP config. Output adapters are saved to `train/output/<timestamp>/`.
 
 ### Evaluation (MTEB benchmarks)
+
+Both eval scripts accept CLI args and log metrics to Weights & Biases. Training and eval always run on remote GPU instances — `train/output/` is empty locally by design.
+
 ```bash
 cd eval/mteb
-python minicpm_sts_eval.py        # STS benchmarks
-python minicpm_retrieval_eval.py  # Retrieval benchmarks
+python minicpm_sts_eval.py \
+  --adapter_path ../../train/output/<timestamp> \
+  --wandb_name sts-eval
+
+python minicpm_retrieval_eval.py \
+  --adapter_path ../../train/output/<timestamp> \
+  --wandb_name retrieval-eval
 ```
+
+All args (`--model_path`, `--adapter_path`, `--wandb_project`, `--wandb_name`) have sensible defaults. Run `--help` for details.
 
 Results saved to `eval/mteb/results/minicpm/`.
 
@@ -83,7 +93,11 @@ Results saved to `eval/mteb/results/minicpm/`.
 ### Evaluation (`eval/mteb/`)
 
 - **`model/minicpm.py`** — `MiniCPM` wrapper class with `encode()` method for MTEB compatibility. Extracts embeddings from the last hidden state of the final token. Optionally loads a LoRA adapter.
-- Eval scripts expect model at `pretrained/MiniCPM-2B-dpo-bf16` and adapter at `pretrained/adapter/<timestamp>/`.
+- **`minicpm_sts_eval.py`** / **`minicpm_retrieval_eval.py`** — Accept CLI args (`--model_path`, `--adapter_path`, `--wandb_project`, `--wandb_name`) and log per-task metrics + summary tables to W&B.
+
+### Coding conventions
+
+- **Always use `tqdm`** for loops that process more than a trivial number of items (encoding sentences, iterating over dataset rows, etc.). Include a `desc` label and `unit`. Log a summary line with total count, elapsed time, and throughput after completion.
 
 ### Key design decisions
 

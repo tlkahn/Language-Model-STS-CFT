@@ -1,16 +1,15 @@
+import argparse
+import gc
+import json
+import logging
+
+import torch
+import wandb
 from model.minicpm import MiniCPM
 from mteb import MTEB
-import logging
-import wandb
 
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("main")
-
-model_path = '../../pretrained/MiniCPM-2B-dpo-bf16'
-adapter_path = '../../train/output/20260220130038'
-
-model = MiniCPM(model_path=model_path,
-                adapter_path=adapter_path)
+logger = logging.getLogger("sts_eval")
 
 TASK_LIST_STS = [
     "BIOSSES",
@@ -22,25 +21,66 @@ TASK_LIST_STS = [
     "STS16",
     "STS17",
     "STS22",
-    "STSBenchmark"
+    "STSBenchmark",
 ]
 
-wandb.init(project="LM-STS-CFT", name="sts-eval", job_type="eval")
 
-all_spearman = {}
+def parse_args():
+    parser = argparse.ArgumentParser(description="Run MTEB STS benchmarks with MiniCPM")
+    parser.add_argument("--model_path", type=str, default="../../pretrained/MiniCPM-2B-dpo-bf16",
+                        help="Path to base model")
+    parser.add_argument("--adapter_path", type=str, default="../../train/output/20260221004650",
+                        help="Path to LoRA adapter")
+    parser.add_argument("--wandb_project", type=str, default="LM-STS-CFT",
+                        help="W&B project name")
+    parser.add_argument("--wandb_name", type=str, default="sts-eval",
+                        help="W&B run name")
+    return parser.parse_args()
 
-for task in TASK_LIST_STS:
-    logger.info(f"Running task: {task}")
-    evaluation = MTEB(tasks=[task], task_langs=["en"])
-    results = evaluation.run(model, output_folder=f"results/minicpm/sts", overwrite_results=True)
 
-    task_scores = results.get(task, list(results.values())[0])
-    metrics = task_scores.get("test", task_scores.get("validation", {}))
-    if metrics:
+def get_split_metrics(task_scores):
+    """Try test, then validation split. Returns metrics dict or None."""
+    for split in ("test", "validation"):
+        if split in task_scores:
+            return task_scores[split]
+    return None
+
+
+def main():
+    args = parse_args()
+
+    model = MiniCPM(model_path=args.model_path, adapter_path=args.adapter_path)
+
+    wandb.init(
+        project=args.wandb_project,
+        name=args.wandb_name,
+        job_type="eval",
+        config={"model_path": args.model_path, "adapter_path": args.adapter_path},
+    )
+
+    all_spearman = {}
+
+    for task in TASK_LIST_STS:
+        logger.info(f"Running task: {task}")
+        evaluation = MTEB(tasks=[task], task_langs=["en"])
+        results = evaluation.run(model, output_folder="results/minicpm/sts", overwrite_results=True)
+
+        task_scores = results.get(task)
+        if task_scores is None:
+            logger.error(f"Task '{task}' not found in results. Available keys: {list(results.keys())}")
+            continue
+
+        logger.debug(f"Raw results for {task}: {json.dumps(task_scores, indent=2)}")
+
+        metrics = get_split_metrics(task_scores)
+        if metrics is None:
+            logger.error(f"No test/validation split for '{task}'. Available splits: {list(task_scores.keys())}")
+            continue
+
         cos_sim = metrics.get("cos_sim", {})
-        spearman = cos_sim.get("spearman", None)
-        pearson = cos_sim.get("pearson", None)
-        eval_time = metrics.get("evaluation_time", None)
+        spearman = cos_sim.get("spearman")
+        pearson = cos_sim.get("pearson")
+        eval_time = metrics.get("evaluation_time")
 
         log_dict = {}
         if spearman is not None:
@@ -53,16 +93,24 @@ for task in TASK_LIST_STS:
         if log_dict:
             wandb.log(log_dict)
 
-if all_spearman:
-    avg_spearman = sum(all_spearman.values()) / len(all_spearman)
-    wandb.log({"avg_spearman": avg_spearman})
-    logger.info(f"Average Spearman: {avg_spearman:.4f}")
+        logger.info(f"{task}: spearman={spearman}, pearson={pearson}")
 
-    table = wandb.Table(columns=["task", "cos_sim_spearman"])
-    for task_name, score in all_spearman.items():
-        table.add_data(task_name, score)
-    wandb.log({"sts_summary": table})
+        # Free fragmented CUDA memory between tasks
+        gc.collect()
+        torch.cuda.empty_cache()
 
-wandb.finish()
+    if all_spearman:
+        avg_spearman = sum(all_spearman.values()) / len(all_spearman)
+        wandb.log({"avg_spearman": avg_spearman})
+        logger.info(f"Average Spearman: {avg_spearman:.4f}")
+
+        table = wandb.Table(columns=["task", "cos_sim_spearman"])
+        for task_name, score in all_spearman.items():
+            table.add_data(task_name, score)
+        wandb.log({"sts_summary": table})
+
+    wandb.finish()
 
 
+if __name__ == "__main__":
+    main()

@@ -168,9 +168,6 @@ processed_pilot/
 # lightning logs
 lightning_logs/
 
-# ipynb
-*.ipynb
-
 # model checkpoint
 checkpoint/
 
