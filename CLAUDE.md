@@ -11,7 +11,7 @@ Contrastive fine-tuning (CFT) of small language models (up to 2B params) for tex
 ```bash
 uv venv --python 3.11
 source .venv/bin/activate
-uv pip install -e .   # or: uv pip install -r pyproject.toml
+uv pip install -r pyproject.toml
 ```
 
 Dependencies are declared in `pyproject.toml`. Python 3.11, PyTorch 2.2, Transformers 4.40, PEFT 0.10. Requires CUDA GPUs for training.

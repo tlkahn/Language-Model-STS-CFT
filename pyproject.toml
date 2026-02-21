@@ -1,3 +1,11 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build]
+skip-excluded-dirs = true
+include = []          # nothing to package — deps-only project
+
 [project]
 name = "language-model-sts-cft"
 version = "0.1.0"
