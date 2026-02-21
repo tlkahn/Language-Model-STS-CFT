@@ -35,8 +35,15 @@ def main(model_args, data_args, training_args):
     set_seed(training_args.seed)
 
     # Model
-    model = AutoModelForCausalLM.from_pretrained(model_args.model_name_or_path, 
-                                                torch_dtype=torch.bfloat16,
+    if training_args.bf16:
+        torch_dtype = torch.bfloat16
+    elif training_args.fp16:
+        torch_dtype = torch.float16
+    else:
+        torch_dtype = torch.float32
+
+    model = AutoModelForCausalLM.from_pretrained(model_args.model_name_or_path,
+                                                torch_dtype=torch_dtype,
                                                 trust_remote_code=True,
                                                 local_files_only=True)
 
@@ -50,6 +57,9 @@ def main(model_args, data_args, training_args):
                             inference_mode=False)
 
     model = get_peft_model(model, lora_config)
+
+    if training_args.gradient_checkpointing:
+        model.enable_input_require_grads()
 
     # Data
     train_dataset = load_from_disk(data_args.train_data_path)
