@@ -107,9 +107,9 @@ When running training or evaluation on a remote GPU instance (Lambda Cloud, etc.
    ./train.sh 2>&1 | tee train_$(date +%Y%m%d%H%M%S).log
    ```
 
-3. **Always send a push notification on completion** — Append an `ntfy.sh` curl after every long-running command so the user gets notified on their iPhone.
+3. **Always send a push notification on completion** — Append an `ntfy.sh` curl after every long-running command so the user gets notified on their iPhone. Use `set -o pipefail` so `$?` reflects the training script's exit code, not `tee`'s.
    ```bash
-   ./train.sh 2>&1 | tee train.log; \
+   set -o pipefail; ./train.sh 2>&1 | tee train.log; \
      curl -d "Training finished (exit code: $?)" ntfy.sh/LM-STS-CFT
    ```
 
@@ -117,6 +117,22 @@ When composing remote commands, combine all three:
 ```bash
 tmux new -s training
 # then inside tmux:
-./train.sh 2>&1 | tee train_$(date +%Y%m%d%H%M%S).log; \
+set -o pipefail; ./train.sh 2>&1 | tee train_$(date +%Y%m%d%H%M%S).log; \
   curl -d "Training finished (exit code: $?)" ntfy.sh/LM-STS-CFT
 ```
+
+4. **JupyterLab for data tasks** — Run JupyterLab on the remote in a dedicated tmux session, then SSH-tunnel the port locally.
+
+   On the remote:
+   ```bash
+   tmux new -s jupyter
+   cd ~/Language-Model-STS-CFT && source .venv/bin/activate
+   jupyter lab --no-browser --port 8888 --ip 127.0.0.1
+   ```
+
+   On the local machine:
+   ```bash
+   ssh -fNL 8888:127.0.0.1:8888 lambda
+   ```
+
+   Then open the `http://127.0.0.1:8888/lab?token=...` URL printed in the remote tmux session.
