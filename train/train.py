@@ -5,13 +5,17 @@ from typing import Optional
 from datasets import load_from_disk
 from dataclasses import dataclass, field
 from contrastive_trainer import ContrastiveTrainer
-from peft import LoraConfig, TaskType, get_peft_model
+from peft import LoraConfig, PeftModel, TaskType, get_peft_model
 from transformers import AutoModelForCausalLM, HfArgumentParser, set_seed
 
 @dataclass
 class ModelArguments:
     model_name_or_path: str = field(
         metadata={"help": "Path to pretrained model or model identifier from huggingface.co/models"}
+    )
+    adapter_path: Optional[str] = field(
+        default=None,
+        metadata={"help": "Path to a pre-trained LoRA adapter for continued fine-tuning (two-stage training)"},
     )
     lora_alpha: Optional[int] = field(default=32)
     lora_dropout: Optional[float] = field(default=0.1)
@@ -44,19 +48,21 @@ def main(model_args, data_args, training_args):
 
     model = AutoModelForCausalLM.from_pretrained(model_args.model_name_or_path,
                                                 torch_dtype=torch_dtype,
-                                                trust_remote_code=True,
-                                                local_files_only=True)
+                                                trust_remote_code=True)
 
     # PEFT
-    lora_config = LoraConfig(init_lora_weights="gaussian",
-                            task_type=TaskType.CAUSAL_LM,
-                            target_modules=["q_proj", "v_proj"],
-                            r=model_args.lora_r,
-                            lora_alpha=model_args.lora_alpha,
-                            lora_dropout=model_args.lora_dropout,
-                            inference_mode=False)
+    if model_args.adapter_path is not None:
+        model = PeftModel.from_pretrained(model, model_args.adapter_path, is_trainable=True)
+    else:
+        lora_config = LoraConfig(init_lora_weights="gaussian",
+                                task_type=TaskType.CAUSAL_LM,
+                                target_modules=model_args.lora_target_modules.split(","),
+                                r=model_args.lora_r,
+                                lora_alpha=model_args.lora_alpha,
+                                lora_dropout=model_args.lora_dropout,
+                                inference_mode=False)
 
-    model = get_peft_model(model, lora_config)
+        model = get_peft_model(model, lora_config)
 
     if training_args.gradient_checkpointing:
         model.enable_input_require_grads()
@@ -81,7 +87,7 @@ def main(model_args, data_args, training_args):
     trainer.save_model(training_args.output_dir)
 
 if __name__ == "__main__":
-    os.environ["WANDB_PROJECT"] = "minicpm-dense-retrieval"
+    os.environ["WANDB_PROJECT"] = "LM-STS-CFT"
     parser = HfArgumentParser((ModelArguments, DataArguments, TrainingArguments))
     model_args, data_args, training_args = parser.parse_args_into_dataclasses()
     main(model_args, data_args, training_args)

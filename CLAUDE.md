@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Contrastive fine-tuning (CFT) of small language models (up to 2B params) for text embedding, using InfoNCE loss with LoRA. The project trains models to produce better sentence embeddings for Semantic Textual Similarity (STS) tasks, evaluated via MTEB benchmarks.
+Contrastive fine-tuning (CFT) of small language models (up to 2B params) for text embedding, using InfoNCE loss with LoRA. The project trains models to produce better sentence embeddings for Semantic Textual Similarity (STS) tasks, evaluated via MTEB benchmarks and custom Sanskrit STS evaluation.
 
 ## Environment Setup
 
@@ -16,9 +16,19 @@ uv pip install -r pyproject.toml
 
 Dependencies are declared in `pyproject.toml`. Python 3.11, PyTorch 2.2, Transformers 4.40, PEFT 0.10. Requires CUDA GPUs for training.
 
-## Pretrained Model
+## Pretrained Models
 
-The `pretrained/` directory is gitignored. Download the full model (required for data prep, training, and evaluation):
+The `pretrained/` directory is gitignored. Two backbones are supported:
+
+### Sarvam-1 (primary — Sanskrit-capable)
+
+```bash
+cd data && ./download_sarvam.sh
+```
+
+This downloads `sarvamai/sarvam-1` to `pretrained/sarvam-1/` and sets `add_eos_token: true` in the tokenizer config. Sarvam-1 tokenizes Sanskrit at ~3.9x fertility with meaningful Devanagari subwords.
+
+### MiniCPM-2B (legacy — English)
 
 ```bash
 huggingface-cli download openbmb/MiniCPM-2B-dpo-bf16 \
@@ -47,20 +57,43 @@ Pilot mode (smaller dataset for quick iteration):
 python nli_preprocess.py --num_rows 1000   # saves to data/processed_pilot/
 ```
 
-Note: `sentencepiece` is required for the MiniCPM (LLaMA-based) tokenizer and is included in `pyproject.toml`.
-
-### Training (multi-GPU with DDP via Accelerate)
+Custom dataset with Sarvam-1 tokenizer:
 ```bash
-cd train
-# Configure GPU count in configs/ddp_config.yaml (num_processes field)
-./train.sh
+python nli_preprocess.py --input_csv saiva_triplets.csv \
+  --tokenizer_path ../pretrained/sarvam-1/ --output_dir ./processed_shaiva/
 ```
 
-The train script uses `accelerate launch` with the DDP config. Output adapters are saved to `train/output/<timestamp>/`.
+All preprocessing args: `--tokenizer_path`, `--max_length`, `--input_csv`, `--output_dir`, `--num_rows`. Run `--help` for details.
+
+### Training (multi-GPU with DDP via Accelerate)
+
+**Single-stage (Sarvam-1):**
+```bash
+cd train
+./train_sarvam.sh          # multi-GPU DDP training
+./train_sarvam_local.sh    # local dev (MPS/CPU, pilot data)
+```
+
+**Two-stage (load pre-trained adapter for continued fine-tuning):**
+```bash
+cd train
+./train_sarvam_stage2.sh output/<stage1_timestamp>
+```
+
+Stage 2 uses lower learning rate (2e-5 vs 5e-5) and fewer steps (500 vs 1000) to preserve stage-1 gains. Pass `--adapter_path` to `train.py` for any custom two-stage workflow.
+
+**Legacy (MiniCPM):**
+```bash
+cd train
+./train.sh                 # multi-GPU DDP training
+./train_local.sh           # local dev
+```
+
+The train scripts use `accelerate launch` with the DDP config. Output adapters are saved to `train/output/<timestamp>/`.
 
 ### Evaluation (MTEB benchmarks)
 
-Both eval scripts accept CLI args and log metrics to Weights & Biases. Training and eval always run on remote GPU instances — `train/output/` is empty locally by design.
+Both MTEB eval scripts accept CLI args and log metrics to Weights & Biases. Training and eval always run on remote GPU instances — `train/output/` is empty locally by design.
 
 ```bash
 cd eval/mteb
@@ -73,27 +106,49 @@ python minicpm_retrieval_eval.py \
   --wandb_name retrieval-eval
 ```
 
-All args (`--model_path`, `--adapter_path`, `--wandb_project`, `--wandb_name`) have sensible defaults. Run `--help` for details.
+All args (`--model_path`, `--adapter_path`, `--wandb_project`, `--wandb_name`) have sensible defaults (Sarvam-1 base model). Run `--help` for details.
 
 Results saved to `eval/mteb/results/minicpm/`.
+
+### Evaluation (Sanskrit STS)
+
+Custom Sanskrit STS evaluation using VBT (Vijnanabhairava Tantra) benchmark pairs:
+
+```bash
+# One-time: generate eval pairs JSON from VBT corpus
+cd eval && python vbt_to_json.py
+
+# Run evaluation
+python sanskrit_sts_eval.py \
+  --eval_data vbt_eval_pairs.json \
+  --adapter_path ../train/output/<timestamp> \
+  --wandb_name sanskrit-sts
+```
+
+Reports 4 metrics: mean similarity (similar pairs), mean similarity (dissimilar pairs), discrimination (delta), and AUC-ROC. All logged to W&B.
 
 ## Architecture
 
 ### Training pipeline (`train/`)
 
-- **`train.py`** — Entry point. Parses `ModelArguments`, `DataArguments`, and custom `TrainingArguments` (adds `temperature` param) via HfArgumentParser. Loads a causal LM, wraps it with LoRA via PEFT, loads preprocessed dataset, and runs `ContrastiveTrainer`.
+- **`train.py`** — Entry point. Parses `ModelArguments` (includes `adapter_path` for two-stage training), `DataArguments`, and custom `TrainingArguments` (adds `temperature` param) via HfArgumentParser. Loads a causal LM, wraps it with LoRA via PEFT (or loads a pre-trained adapter), loads preprocessed dataset, and runs `ContrastiveTrainer`.
 - **`contrastive_trainer.py`** — Subclass of HuggingFace `Trainer`. Overrides `compute_loss` to encode three inputs (anchor/`sent0`, positive/`sent1`, hard negative/`hard_neg`) by extracting the last hidden state at the final token position, then passes embeddings to InfoNCE loss.
 - **`loss.py`** — `InfoNCE` module. Normalizes embeddings, uses `AllGather` across GPUs for global batch negatives, computes cosine similarity logits, and applies cross-entropy with temperature scaling.
 - **`utils.py`** — Custom `AllGather` autograd function for gradient-enabled all-gather across distributed processes.
 
 ### Data (`data/`)
 
-- **`nli_preprocess.py`** — Tokenizes NLI triplets (sent0, sent1, hard_neg) with the MiniCPM tokenizer, padding to max_length=150. Saves as HuggingFace dataset to `data/processed/` (or `data/processed_pilot/` with `--num_rows`). Expects pretrained model at `pretrained/MiniCPM-2B-dpo-bf16/`.
+- **`nli_preprocess.py`** — Tokenizes triplets (sent0, sent1, hard_neg) with a configurable tokenizer (default: Sarvam-1), padding to configurable max_length (default: 150). Saves as HuggingFace dataset. Accepts `--tokenizer_path`, `--max_length`, `--input_csv`, `--output_dir`, `--num_rows`.
 
 ### Evaluation (`eval/mteb/`)
 
-- **`model/minicpm.py`** — `MiniCPM` wrapper class with `encode()` method for MTEB compatibility. Extracts embeddings from the last hidden state of the final token. Optionally loads a LoRA adapter.
+- **`model/causal_lm.py`** — `CausalLMEncoder` wrapper class with `encode()` method for MTEB compatibility. Extracts embeddings from the last hidden state of the final token. Optionally loads a LoRA adapter. Works with any LlamaForCausalLM-compatible model.
 - **`minicpm_sts_eval.py`** / **`minicpm_retrieval_eval.py`** — Accept CLI args (`--model_path`, `--adapter_path`, `--wandb_project`, `--wandb_name`) and log per-task metrics + summary tables to W&B.
+
+### Evaluation (`eval/`)
+
+- **`sanskrit_sts_eval.py`** — Custom Sanskrit STS evaluation. Encodes VBT verse pairs, computes cosine similarity, reports discrimination and AUC-ROC. Logs to W&B.
+- **`vbt_to_json.py`** — One-time utility to convert VBT corpus similarity/dissimilarity pairs to JSON eval format.
 
 ### Coding conventions
 
@@ -101,8 +156,9 @@ Results saved to `eval/mteb/results/minicpm/`.
 
 ### Key design decisions
 
-- Embeddings are extracted from the **last token** (EOS) of the **last hidden layer** — the tokenizer must have `add_eos_token: true` set in `tokenizer_config.json`.
-- LoRA targets `q_proj` and `v_proj` by default (rank 8, alpha 32, dropout 0.1).
+- Embeddings are extracted from the **last token** (EOS) of the **last hidden layer** — the tokenizer must have `add_eos_token: true` set (enforced programmatically in all code paths).
+- LoRA targets `q_proj` and `v_proj` by default (rank 8, alpha 32, dropout 0.1). Configurable via `--lora_target_modules`.
+- **Two-stage training**: pass `--adapter_path` to `train.py` to load a pre-trained LoRA adapter and continue fine-tuning. The adapter is loaded with `is_trainable=True` via `PeftModel.from_pretrained()`.
 - In-batch negatives are combined with explicit hard negatives in the InfoNCE loss. `AllGather` enables using negatives across all GPUs for a larger effective batch.
 - Pretrained models are expected at `pretrained/` (gitignored). Trained adapters go to `train/output/` (also gitignored).
 

@@ -5,7 +5,7 @@ import logging
 
 import torch
 import wandb
-from model.minicpm import MiniCPM
+from model.causal_lm import CausalLMEncoder
 from mteb import MTEB
 
 logging.basicConfig(level=logging.INFO)
@@ -45,7 +45,7 @@ KEY_METRICS = ["ndcg_at_10", "map_at_100", "mrr_at_100", "recall_at_100"]
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Run MTEB retrieval benchmarks with MiniCPM")
-    parser.add_argument("--model_path", type=str, default="../../pretrained/MiniCPM-2B-dpo-bf16",
+    parser.add_argument("--model_path", type=str, default="../../pretrained/sarvam-1",
                         help="Path to base model")
     parser.add_argument("--adapter_path", type=str, default="../../train/output/20260221004650",
                         help="Path to LoRA adapter")
@@ -67,7 +67,7 @@ def get_split_metrics(task_scores):
 def main():
     args = parse_args()
 
-    model = MiniCPM(model_path=args.model_path, adapter_path=args.adapter_path)
+    model = CausalLMEncoder(model_path=args.model_path, adapter_path=args.adapter_path)
 
     wandb.init(
         project=args.wandb_project,

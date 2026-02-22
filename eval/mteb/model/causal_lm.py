@@ -10,9 +10,10 @@ torch.manual_seed(0)
 logger = logging.getLogger(__name__)
 
 
-class MiniCPM:
-    def __init__(self, model_path='openbmb/MiniCPM-2B-dpo-bf16', adapter_path=None):
+class CausalLMEncoder:
+    def __init__(self, model_path='sarvamai/sarvam-1', adapter_path=None):
         self.tokenizer = AutoTokenizer.from_pretrained(model_path)
+        self.tokenizer.add_eos_token = True
         if self.tokenizer.pad_token is None:
             self.tokenizer.pad_token = self.tokenizer.eos_token
         self.model = AutoModelForCausalLM.from_pretrained(model_path,
