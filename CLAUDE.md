@@ -168,6 +168,22 @@ python sanskrit_sts_eval.py \
 
 Reports 4 metrics: mean similarity (similar pairs), mean similarity (dissimilar pairs), discrimination (delta), and AUC-ROC. All logged to W&B.
 
+### Evaluation (Baseline comparison on Trika data)
+
+Benchmarks off-the-shelf embedding models (LaBSE, E5-multilingual, BGE-M3, Vyakyarth) against Sarvam-1 (base and fine-tuned) on held-out Trika eval data (Śiva Sūtra + Spanda Kārikā). Reports cross-lingual retrieval (MRR, R@k), STS correlation (Spearman ρ), triplet discrimination, and anisotropy.
+
+```bash
+cd eval
+python baseline_comparison.py                                        # all models
+python baseline_comparison.py --models labse e5 sarvam_ft            # subset
+python baseline_comparison.py --adapter_path ../train/output/<timestamp>  # with FT model
+python baseline_comparison.py --no_wandb                             # skip W&B logging
+```
+
+Eval data is in `eval/trika_eval_data.py` — a shared module with verse corpora, STS pairs, and triplets extracted from `sn_model_playground.ipynb`.
+
+All args (`--models`, `--model_path`, `--adapter_path`, `--wandb_project`, `--wandb_name`, `--device`, `--no_wandb`). Run `--help` for details.
+
 ## Architecture
 
 ### Training pipeline (`train/`)
@@ -192,6 +208,8 @@ Reports 4 metrics: mean similarity (similar pairs), mean similarity (dissimilar 
 
 - **`sanskrit_sts_eval.py`** — Custom Sanskrit STS evaluation. Encodes VBT verse pairs, computes cosine similarity, reports discrimination and AUC-ROC. Logs to W&B.
 - **`vbt_to_json.py`** — One-time utility to convert VBT corpus similarity/dissimilarity pairs to JSON eval format.
+- **`trika_eval_data.py`** — Shared module with held-out Trika evaluation data (Śiva Sūtra + Spanda Kārikā verse corpora, 21 STS pairs, 16 triplets). Used by `baseline_comparison.py`.
+- **`baseline_comparison.py`** — Benchmarks off-the-shelf embedding models (LaBSE, E5, BGE-M3, Vyakyarth) against Sarvam-1 on Trika eval data. Reports cross-lingual retrieval, STS correlation, triplet discrimination, and anisotropy. Logs to W&B.
 
 ### Coding conventions
 
