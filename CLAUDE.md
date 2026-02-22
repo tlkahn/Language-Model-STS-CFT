@@ -65,6 +65,47 @@ python nli_preprocess.py --input_csv saiva_triplets.csv \
 
 All preprocessing args: `--tokenizer_path`, `--max_length`, `--input_csv`, `--output_dir`, `--num_rows`. Run `--help` for details.
 
+#### Itihasa triplets (Stage 1 — general Sanskrit)
+
+```bash
+cd data
+python itihasa_triplets.py                             # ~167K cross-lingual + monolingual Sa triplets
+python itihasa_triplets.py --num_rows 1000             # pilot mode
+python itihasa_triplets.py --triplet_types mono_sa     # Sanskrit-only triplets
+```
+
+Downloads `rahular/itihasa` (93K Sanskrit-English parallel pairs from Ramayana + Mahabharata). Generates cross-lingual triplets `(sn, en, distant_en)` and monolingual Sanskrit triplets `(sn[i], sn[i+1], distant_sn)`. Hard negatives sampled from >=100 positions away.
+
+All args: `--output_csv`, `--triplet_types`, `--min_distance`, `--num_rows`, `--seed`. Run `--help` for details.
+
+#### VBT triplets (Stage 2 — Saiva domain)
+
+```bash
+cd data
+python vbt_triplets.py                                 # ~630 triplets from 4 strategies
+python vbt_triplets.py --strategies A C                # subset of strategies
+python vbt_triplets.py --n_negs 5                      # more negatives per sim pair
+```
+
+Generates triplets from 168 VBT verses using 4 strategies: (A) direct from similarity pairs, (B) combinatorial within-domain expansion, (C) cross-lingual Sa->En, (D) reverse En->Sa. All hard negatives sourced from Itihasa corpus. Uses union-find over similarity pairs to identify practice domains.
+
+All args: `--output_csv`, `--sa_embedding_path`, `--strategies`, `--n_negs`, `--seed`. Run `--help` for details.
+
+#### Full two-stage data prep workflow
+
+```bash
+cd data
+# Stage 1: Itihasa
+python itihasa_triplets.py                             # -> itihasa_triplets.csv
+python nli_preprocess.py --input_csv itihasa_triplets.csv \
+  --output_dir ./processed_itihasa/                    # -> processed_itihasa/
+
+# Stage 2: VBT
+python vbt_triplets.py                                 # -> vbt_triplets.csv
+python nli_preprocess.py --input_csv vbt_triplets.csv \
+  --output_dir ./processed_shaiva/                     # -> processed_shaiva/
+```
+
 ### Training (multi-GPU with DDP via Accelerate)
 
 **Single-stage (Sarvam-1):**
@@ -139,6 +180,8 @@ Reports 4 metrics: mean similarity (similar pairs), mean similarity (dissimilar 
 ### Data (`data/`)
 
 - **`nli_preprocess.py`** — Tokenizes triplets (sent0, sent1, hard_neg) with a configurable tokenizer (default: Sarvam-1), padding to configurable max_length (default: 150). Saves as HuggingFace dataset. Accepts `--tokenizer_path`, `--max_length`, `--input_csv`, `--output_dir`, `--num_rows`.
+- **`itihasa_triplets.py`** — Downloads `rahular/itihasa` (93K Sanskrit-English parallel pairs). Generates cross-lingual `(sn, en, distant_en)` and monolingual Sanskrit `(sn[i], sn[i+1], distant_sn)` triplets with positional distance-based hard negatives.
+- **`vbt_triplets.py`** — Generates ~630 triplets from 168 VBT verses via 4 strategies (sim pairs, within-domain expansion, cross-lingual, reverse cross-lingual). Uses union-find for domain detection. Hard negatives from Itihasa corpus.
 
 ### Evaluation (`eval/mteb/`)
 
@@ -165,6 +208,8 @@ Reports 4 metrics: mean similarity (similar pairs), mean similarity (dissimilar 
 ## Remote Training Practices
 
 When running training or evaluation on a remote GPU instance (Lambda Cloud, etc.), always follow these conventions:
+
+0. **Install GPU drivers first** — On a fresh Lambda Cloud instance, `nvidia-smi` may not work. Before anything else, run `/setup-gpu` (or follow the steps in `.claude/skills/setup-gpu/SKILL.md`) to install the NVIDIA driver. Do not proceed with environment setup or training until `nvidia-smi` shows the GPU correctly.
 
 1. **Always use `tmux`** — Every SSH session to a remote machine must start inside a `tmux` session so that long-running jobs survive disconnects.
    ```bash

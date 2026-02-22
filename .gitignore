@@ -164,6 +164,8 @@ cython_debug/
 *.csv
 processed/
 processed_pilot/
+processed_itihasa/
+processed_shaiva/
 
 # lightning logs
 lightning_logs/
