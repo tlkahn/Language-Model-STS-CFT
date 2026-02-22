@@ -1,0 +1,147 @@
+You try to use a model that was created with version 3.4.1, however, your version is 2.7.0. This might cause unexpected behavior or errors. In that case, try to update to the latest version.
+
+
+
+You set `add_prefix_space`. The tokenizer needs to be converted from the slow tokenizers
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  1.04it/s]Loading checkpoint shards: 100%|██████████| 2/2 [00:01<00:00,  2.11it/s]Loading checkpoint shards: 100%|██████████| 2/2 [00:01<00:00,  1.83it/s]
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  1.04it/s]Loading checkpoint shards: 100%|██████████| 2/2 [00:01<00:00,  2.11it/s]Loading checkpoint shards: 100%|██████████| 2/2 [00:01<00:00,  1.83it/s]
+=== PER-TRIPLET MARGINS (pos_sim - neg_sim) ===
+Category        Triplet                                            LaBSE         E5     BGE-M3  Vyakyarth       Base         FT
+-------------------------------------------------------------------------------------------------------------------------------
+Encoding:   0%|          | 0/3 [00:00<?, ?sent/s]Encoding:  67%|██████▋   | 2/3 [00:00<00:00, 16.99sent/s]Encoding: 100%|██████████| 3/3 [00:00<00:00, 20.44sent/s]
+Encoding:   0%|          | 0/3 [00:00<?, ?sent/s]Encoding: 100%|██████████| 3/3 [00:00<00:00, 26.22sent/s]Encoding: 100%|██████████| 3/3 [00:00<00:00, 26.18sent/s]
+mono_sa         SS 1.7 <> SK 3 vs SS 3.45                        +0.3135    +0.0314    +0.1691    -0.0186    -0.0077    +0.2512
+Encoding:   0%|          | 0/3 [00:00<?, ?sent/s]Encoding: 100%|██████████| 3/3 [00:00<00:00, 34.77sent/s]
+Encoding:   0%|          | 0/3 [00:00<?, ?sent/s]Encoding: 100%|██████████| 3/3 [00:00<00:00, 27.33sent/s]Encoding: 100%|██████████| 3/3 [00:00<00:00, 27.29sent/s]
+mono_sa         SS 1.12 <> SK 11 vs SK 48                        -0.0286    -0.0035    +0.0435    -0.0736    -0.0223    -0.1228
+Encoding:   0%|          | 0/3 [00:00<?, ?sent/s]Encoding: 100%|██████████| 3/3 [00:00<00:00, 34.97sent/s]
+Encoding:   0%|          | 0/3 [00:00<?, ?sent/s]Encoding: 100%|██████████| 3/3 [00:00<00:00, 27.32sent/s]Encoding: 100%|██████████| 3/3 [00:00<00:00, 27.29sent/s]
+mono_sa         SS 3.26 <> SK 30 vs SS 3.45                      +0.0248    -0.0308    -0.0181    -0.0589    +0.0187    -0.1115
+Encoding:   0%|          | 0/3 [00:00<?, ?sent/s]Encoding: 100%|██████████| 3/3 [00:00<00:00, 34.98sent/s]
+Encoding:   0%|          | 0/3 [00:00<?, ?sent/s]Encoding: 100%|██████████| 3/3 [00:00<00:00, 27.27sent/s]Encoding: 100%|██████████| 3/3 [00:00<00:00, 27.23sent/s]
+mono_sa         SK 21 <> SK 44 vs SS 1.1                         +0.2997    +0.0910    +0.1881    +0.0108    +0.0526    -0.0479
+Encoding:   0%|          | 0/3 [00:00<?, ?sent/s]Encoding: 100%|██████████| 3/3 [00:00<00:00, 34.44sent/s]
+Encoding:   0%|          | 0/3 [00:00<?, ?sent/s]Encoding: 100%|██████████| 3/3 [00:00<00:00, 26.95sent/s]Encoding: 100%|██████████| 3/3 [00:00<00:00, 26.92sent/s]
+mono_sa         SS 1.5 <> SK 22 vs SS 2.6                        -0.1887    -0.0461    -0.0254    -0.3500    -0.0118    -0.3592
+Encoding:   0%|          | 0/3 [00:00<?, ?sent/s]Encoding: 100%|██████████| 3/3 [00:00<00:00, 34.40sent/s]
+Encoding:   0%|          | 0/3 [00:00<?, ?sent/s]Encoding: 100%|██████████| 3/3 [00:00<00:00, 26.99sent/s]Encoding: 100%|██████████| 3/3 [00:00<00:00, 26.95sent/s]
+mono_sa         SS 1.22 <> SS 2.1 vs SK 9                        +0.2394    +0.0155    +0.1224    -0.0277    -0.0187    +0.2871
+Encoding:   0%|          | 0/3 [00:00<?, ?sent/s]Encoding: 100%|██████████| 3/3 [00:00<00:00, 34.35sent/s]
+Encoding:   0%|          | 0/3 [00:00<?, ?sent/s]Encoding: 100%|██████████| 3/3 [00:00<00:00, 27.00sent/s]Encoding: 100%|██████████| 3/3 [00:00<00:00, 26.97sent/s]
+mono_sa         SK 1 <> SK 2 vs SS 3.12                          +0.2036    +0.0629    +0.0653    -0.1361    +0.0049    -0.0217
+Encoding:   0%|          | 0/3 [00:00<?, ?sent/s]Encoding: 100%|██████████| 3/3 [00:00<00:00, 34.48sent/s]
+Encoding:   0%|          | 0/3 [00:00<?, ?sent/s]Encoding: 100%|██████████| 3/3 [00:00<00:00, 27.00sent/s]Encoding: 100%|██████████| 3/3 [00:00<00:00, 26.97sent/s]
+mono_sa         SS 3.43 <> SK 9 vs SS 2.1                        +0.0519    +0.0318    +0.0691    -0.0557    -0.0264    +0.1728
+Encoding:   0%|          | 0/3 [00:00<?, ?sent/s]Encoding: 100%|██████████| 3/3 [00:00<00:00, 34.42sent/s]
+Encoding:   0%|          | 0/3 [00:00<?, ?sent/s]Encoding: 100%|██████████| 3/3 [00:00<00:00, 27.09sent/s]Encoding: 100%|██████████| 3/3 [00:00<00:00, 27.05sent/s]
+cross_lingual   SS 1.1 Sa <> SS 1.1 En vs SS 3.45 En             +0.2118    +0.0466    +0.1833    +0.6261    +0.0846    +0.5308
+Encoding:   0%|          | 0/3 [00:00<?, ?sent/s]Encoding: 100%|██████████| 3/3 [00:00<00:00, 34.93sent/s]
+Encoding:   0%|          | 0/3 [00:00<?, ?sent/s]Encoding: 100%|██████████| 3/3 [00:00<00:00, 27.31sent/s]Encoding: 100%|██████████| 3/3 [00:00<00:00, 27.28sent/s]
+cross_lingual   SK 22 Sa <> SK 22 En vs SK 2 En                  +0.1356    +0.0805    +0.1366    +0.1756    +0.0119    +0.2723
+Encoding:   0%|          | 0/3 [00:00<?, ?sent/s]Encoding: 100%|██████████| 3/3 [00:00<00:00, 34.42sent/s]
+Encoding:   0%|          | 0/3 [00:00<?, ?sent/s]Encoding: 100%|██████████| 3/3 [00:00<00:00, 27.41sent/s]Encoding: 100%|██████████| 3/3 [00:00<00:00, 27.38sent/s]
+cross_lingual   SK 30 Sa <> SK 30 En vs SS 1.2 En                +0.1902    +0.1039    +0.2161    +0.2241    +0.0319    +0.1722
+Encoding:   0%|          | 0/3 [00:00<?, ?sent/s]Encoding: 100%|██████████| 3/3 [00:00<00:00, 35.32sent/s]
+Encoding:   0%|          | 0/3 [00:00<?, ?sent/s]Encoding: 100%|██████████| 3/3 [00:00<00:00, 27.57sent/s]Encoding: 100%|██████████| 3/3 [00:00<00:00, 27.53sent/s]
+cross_lingual   SS 3.9 Sa <> SS 3.9 En vs SK 48 En               +0.1785    +0.0638    +0.2359    +0.3880    +0.0067    +0.3967
+Encoding:   0%|          | 0/3 [00:00<?, ?sent/s]Encoding: 100%|██████████| 3/3 [00:00<00:00, 35.35sent/s]
+Encoding:   0%|          | 0/3 [00:00<?, ?sent/s]Encoding: 100%|██████████| 3/3 [00:00<00:00, 27.45sent/s]Encoding: 100%|██████████| 3/3 [00:00<00:00, 27.41sent/s]
+cross_lingual   SK 5 Sa <> SK 5 En vs SS 1.18 En                 +0.2351    +0.0745    +0.1239    +0.3209    -0.0191    +0.2104
+Encoding:   0%|          | 0/3 [00:00<?, ?sent/s]Encoding: 100%|██████████| 3/3 [00:00<00:00, 34.99sent/s]
+Encoding:   0%|          | 0/3 [00:00<?, ?sent/s]Encoding: 100%|██████████| 3/3 [00:00<00:00, 27.35sent/s]Encoding: 100%|██████████| 3/3 [00:00<00:00, 27.32sent/s]
+cross_lingual   SS 1.7 Sa <> SS 1.7 En vs SK 48 En               +0.0820    +0.0123    +0.0732    -0.0591    -0.0103    +0.3695
+Encoding:   0%|          | 0/3 [00:00<?, ?sent/s]Encoding: 100%|██████████| 3/3 [00:00<00:00, 34.99sent/s]
+Encoding:   0%|          | 0/3 [00:00<?, ?sent/s]Encoding: 100%|██████████| 3/3 [00:00<00:00, 27.33sent/s]Encoding: 100%|██████████| 3/3 [00:00<00:00, 27.29sent/s]
+hard            SS 1.1 <> SS 1.17 vs SS 3.9 (all atma)           -0.0405    -0.0058    -0.0126    +0.2833    +0.0032    +0.0390
+Encoding:   0%|          | 0/3 [00:00<?, ?sent/s]Encoding: 100%|██████████| 3/3 [00:00<00:00, 35.08sent/s]
+Encoding:   0%|          | 0/3 [00:00<?, ?sent/s]Encoding: 100%|██████████| 3/3 [00:00<00:00, 27.38sent/s]Encoding: 100%|██████████| 3/3 [00:00<00:00, 27.35sent/s]
+hard            SK 3 <> SK 17 vs SK 21 (all spanda/states)       -0.0054    -0.0119    -0.1044    -0.1311    +0.0327    -0.1707
+
+=== MARGIN SUMMARY BY CATEGORY ===
+Model            mono_sa mean      mono_sa min cross_lingual mean cross_lingual min        hard mean         hard min     overall mean
+--------------------------------------------------------------------------------------------------------------------------------------
+LaBSE                 +0.1145          -0.1887          +0.1722          +0.0820          -0.0229          -0.0405          +0.1189
+E5                    +0.0190          -0.0461          +0.0636          +0.0123          -0.0089          -0.0119          +0.0323
+BGE-M3                +0.0768          -0.0254          +0.1615          +0.0732          -0.0585          -0.1044          +0.0916
+Vyakyarth             -0.0887          -0.3500          +0.2793          -0.0591          +0.0761          -0.1311          +0.0699
+Base                  -0.0013          -0.0264          +0.0176          -0.0191          +0.0180          +0.0032          +0.0082
+FT                    +0.0060          -0.3592          +0.3253          +0.1722          -0.0658          -0.1707          +0.1168
+
+=== STS PER-PAIR COSINES ===
+Score Label                                                   LaBSE         E5     BGE-M3  Vyakyarth       Base         FT
+--------------------------------------------------------------------------------------------------------------------------
+Encoding:   0%|          | 0/2 [00:00<?, ?sent/s]Encoding: 100%|██████████| 2/2 [00:00<00:00, 35.05sent/s]
+Encoding:   0%|          | 0/2 [00:00<?, ?sent/s]Encoding: 100%|██████████| 2/2 [00:00<00:00, 27.40sent/s]
+  5.0 SS 1.7 <> SK 3: both about turiya pervading three states     0.5562     0.9011     0.6273     0.5212     0.9673     0.7233
+Encoding:   0%|          | 0/2 [00:00<?, ?sent/s]Encoding: 100%|██████████| 2/2 [00:00<00:00, 35.46sent/s]
+Encoding:   0%|          | 0/2 [00:00<?, ?sent/s]Encoding: 100%|██████████| 2/2 [00:00<00:00, 27.42sent/s]
+  5.0 SS 1.7 <> SK 17: turiya in three states / spanda in three states     0.4259     0.8699     0.5130     0.4419     0.9775     0.2908
+Encoding:   0%|          | 0/2 [00:00<?, ?sent/s]Encoding: 100%|██████████| 2/2 [00:00<00:00, 35.18sent/s]
+Encoding:   0%|          | 0/2 [00:00<?, ?sent/s]Encoding: 100%|██████████| 2/2 [00:00<00:00, 27.56sent/s]
+  4.5 SS 3.26 <> SK 30: becoming Siva / jivanmukti           0.1884     0.8178     0.4165     0.1880     0.9659     0.3112
+Encoding:   0%|          | 0/2 [00:00<?, ?sent/s]Encoding: 100%|██████████| 2/2 [00:00<00:00, 35.21sent/s]
+Encoding:   0%|          | 0/2 [00:00<?, ?sent/s]Encoding: 100%|██████████| 2/2 [00:00<00:00, 27.54sent/s]
+  4.0 SS 1.1 <> SK 5: consciousness as Self / paramartha beyond duality     0.1273     0.8012     0.3737     0.2707     0.8955     0.3866
+Encoding:   0%|          | 0/2 [00:00<?, ?sent/s]Encoding: 100%|██████████| 2/2 [00:00<00:00, 35.29sent/s]
+Encoding:   0%|          | 0/2 [00:00<?, ?sent/s]Encoding: 100%|██████████| 2/2 [00:00<00:00, 27.51sent/s]
+  4.0 SS 1.12 <> SK 11: wonder (vismaya) / gazing with wonder (smayamana)     0.2687     0.8234     0.4534     0.4250     0.9513     0.5053
+Encoding:   0%|          | 0/2 [00:00<?, ?sent/s]Encoding: 100%|██████████| 2/2 [00:00<00:00, 35.11sent/s]
+Encoding:   0%|          | 0/2 [00:00<?, ?sent/s]Encoding: 100%|██████████| 2/2 [00:00<00:00, 27.58sent/s]
+  4.0 SS 3.43 <> SK 9: freedom despite elements / supreme state when agitation dissolves     0.3401     0.8752     0.4617     0.2088     0.9596     0.5305
+Encoding:   0%|          | 0/2 [00:00<?, ?sent/s]Encoding: 100%|██████████| 2/2 [00:00<00:00, 35.11sent/s]
+Encoding:   0%|          | 0/2 [00:00<?, ?sent/s]Encoding: 100%|██████████| 2/2 [00:00<00:00, 27.26sent/s]
+  3.5 SS 1.5 <> SK 22: upsurge of awareness / spanda in extreme states     0.2228     0.8289     0.4213     0.3309     0.9816     0.4537
+Encoding:   0%|          | 0/2 [00:00<?, ?sent/s]Encoding: 100%|██████████| 2/2 [00:00<00:00, 34.77sent/s]
+Encoding:   0%|          | 0/2 [00:00<?, ?sent/s]Encoding: 100%|██████████| 2/2 [00:00<00:00, 27.24sent/s]
+  3.0 SS 1.22 <> SS 2.1: mantra power / mind-as-mantra       0.4271     0.8936     0.5329     0.5635     0.9681     0.6406
+Encoding:   0%|          | 0/2 [00:00<?, ?sent/s]Encoding: 100%|██████████| 2/2 [00:00<00:00, 34.75sent/s]
+Encoding:   0%|          | 0/2 [00:00<?, ?sent/s]Encoding: 100%|██████████| 2/2 [00:00<00:00, 27.14sent/s]
+  3.0 SS 1.5 <> SS 3.9: dynamic upsurge / cosmic dancer      0.1962     0.8384     0.4170     0.4191     0.9675     0.4263
+Encoding:   0%|          | 0/2 [00:00<?, ?sent/s]Encoding: 100%|██████████| 2/2 [00:00<00:00, 34.88sent/s]
+Encoding:   0%|          | 0/2 [00:00<?, ?sent/s]Encoding: 100%|██████████| 2/2 [00:00<00:00, 27.17sent/s]
+  3.0 SK 21 <> SK 44: discerning spanda in waking / remaining awakened through knowledge     0.5287     0.9156     0.5851     0.4186     0.9432     0.5621
+Encoding:   0%|          | 0/2 [00:00<?, ?sent/s]Encoding: 100%|██████████| 2/2 [00:00<00:00, 34.61sent/s]
+Encoding:   0%|          | 0/2 [00:00<?, ?sent/s]Encoding: 100%|██████████| 2/2 [00:00<00:00, 26.97sent/s]
+  3.0 SS 1.17 <> SS 1.1: atma-jnana / caitanya as atma       0.5661     0.8745     0.5225     0.8500     0.9927     0.7479
+Encoding:   0%|          | 0/2 [00:00<?, ?sent/s]Encoding: 100%|██████████| 2/2 [00:00<00:00, 34.66sent/s]
+Encoding:   0%|          | 0/2 [00:00<?, ?sent/s]Encoding: 100%|██████████| 2/2 [00:00<00:00, 27.20sent/s]
+  2.0 SS 2.6 <> SK 48: guru as means / sakti as path to siddhi     0.2245     0.8209     0.2908     0.3330     0.9700     0.6079
+Encoding:   0%|          | 0/2 [00:00<?, ?sent/s]Encoding: 100%|██████████| 2/2 [00:00<00:00, 34.67sent/s]
+Encoding:   0%|          | 0/2 [00:00<?, ?sent/s]Encoding: 100%|██████████| 2/2 [00:00<00:00, 27.14sent/s]
+  2.0 SS 1.6 <> SK 2: sakticakra -> dissolution / unobstructed source of all     0.1639     0.8262     0.4145     0.0978     0.9730     0.4854
+Encoding:   0%|          | 0/2 [00:00<?, ?sent/s]Encoding: 100%|██████████| 2/2 [00:00<00:00, 34.66sent/s]
+Encoding:   0%|          | 0/2 [00:00<?, ?sent/s]Encoding: 100%|██████████| 2/2 [00:00<00:00, 27.07sent/s]
+  2.0 SS 1.13 <> SK 1: iccha-sakti as Uma / sakticakra and Sankara     0.1179     0.8338     0.3713     0.3127     0.9484     0.4100
+Encoding:   0%|          | 0/2 [00:00<?, ?sent/s]Encoding: 100%|██████████| 2/2 [00:00<00:00, 34.79sent/s]
+Encoding:   0%|          | 0/2 [00:00<?, ?sent/s]Encoding: 100%|██████████| 2/2 [00:00<00:00, 26.97sent/s]
+  1.5 SS 2.5 <> SK 9: natural khecari Siva-state / supreme state when agitation dissolves     0.3366     0.8484     0.4509     0.3734     0.9628     0.5236
+Encoding:   0%|          | 0/2 [00:00<?, ?sent/s]Encoding: 100%|██████████| 2/2 [00:00<00:00, 34.18sent/s]
+Encoding:   0%|          | 0/2 [00:00<?, ?sent/s]Encoding: 100%|██████████| 2/2 [00:00<00:00, 27.15sent/s]
+  1.0 SS 1.18 <> SK 22: bliss of samadhi / anger-joy revealing spanda     0.2437     0.8226     0.4505     0.3916     0.9863     0.3539
+Encoding:   0%|          | 0/2 [00:00<?, ?sent/s]Encoding: 100%|██████████| 2/2 [00:00<00:00, 34.64sent/s]
+Encoding:   0%|          | 0/2 [00:00<?, ?sent/s]Encoding: 100%|██████████| 2/2 [00:00<00:00, 27.18sent/s]
+  1.0 SS 3.21 <> SK 48: pouring turiya into states / sakti as binding force     0.1673     0.8417     0.3412     0.2094     0.9818     0.4223
+Encoding:   0%|          | 0/2 [00:00<?, ?sent/s]Encoding: 100%|██████████| 2/2 [00:00<00:00, 34.83sent/s]
+Encoding:   0%|          | 0/2 [00:00<?, ?sent/s]Encoding: 100%|██████████| 2/2 [00:00<00:00, 27.17sent/s]
+  0.5 SS 1.18 <> SK 48: world-bliss / binding power of sakti     0.2504     0.8235     0.3545     0.3072     0.9838     0.4541
+Encoding:   0%|          | 0/2 [00:00<?, ?sent/s]Encoding: 100%|██████████| 2/2 [00:00<00:00, 34.81sent/s]
+Encoding:   0%|          | 0/2 [00:00<?, ?sent/s]Encoding: 100%|██████████| 2/2 [00:00<00:00, 27.09sent/s]
+  0.0 SS 1.1 <> SS 3.45: consciousness-as-Self / nadi pranayama     0.4249     0.8158     0.3971     0.4390     0.9518     0.3891
+Encoding:   0%|          | 0/2 [00:00<?, ?sent/s]Encoding: 100%|██████████| 2/2 [00:00<00:00, 34.73sent/s]
+Encoding:   0%|          | 0/2 [00:00<?, ?sent/s]Encoding: 100%|██████████| 2/2 [00:00<00:00, 27.12sent/s]
+  0.0 SS 3.45 <> SK 30: nasal pranayama / world as divine play     0.1914     0.8744     0.4390     0.3465     0.9705     0.4001
+Encoding:   0%|          | 0/2 [00:00<?, ?sent/s]Encoding: 100%|██████████| 2/2 [00:00<00:00, 34.79sent/s]
+Encoding:   0%|          | 0/2 [00:00<?, ?sent/s]Encoding: 100%|██████████| 2/2 [00:00<00:00, 27.08sent/s]
+  0.0 SS 2.6 <> SS 3.45: guru as means / nasal pranayama     0.1466     0.8166     0.3375     0.3433     0.9577     0.4194
+
+=== PAIRWISE COSINE STATS (32 Sa verses) ===
+Model            Mean      Std      Min      Max    Range
+--------------------------------------------------------
+LaBSE          0.2938   0.1303  -0.0685   0.6849   0.7534
+E5             0.8568   0.0342   0.7717   0.9407   0.1691
+BGE-M3         0.4443   0.0798   0.2642   0.7428   0.4786
+Vyakyarth      0.3551   0.1344  -0.0312   0.8500   0.8812
+Encoding:   0%|          | 0/32 [00:00<?, ?sent/s]Encoding:  12%|█▎        | 4/32 [00:00<00:00, 34.73sent/s]Encoding:  25%|██▌       | 8/32 [00:00<00:00, 34.74sent/s]Encoding:  38%|███▊      | 12/32 [00:00<00:00, 35.02sent/s]Encoding:  50%|█████     | 16/32 [00:00<00:00, 35.10sent/s]Encoding:  62%|██████▎   | 20/32 [00:00<00:00, 35.15sent/s]Encoding:  75%|███████▌  | 24/32 [00:00<00:00, 35.18sent/s]Encoding:  88%|████████▊ | 28/32 [00:00<00:00, 35.21sent/s]Encoding: 100%|██████████| 32/32 [00:00<00:00, 35.25sent/s]Encoding: 100%|██████████| 32/32 [00:00<00:00, 35.14sent/s]
+Base           0.9641   0.0268   0.8399   0.9978   0.1579
+Encoding:   0%|          | 0/32 [00:00<?, ?sent/s]Encoding:   9%|▉         | 3/32 [00:00<00:01, 27.34sent/s]Encoding:  19%|█▉        | 6/32 [00:00<00:00, 27.43sent/s]Encoding:  28%|██▊       | 9/32 [00:00<00:00, 27.44sent/s]Encoding:  38%|███▊      | 12/32 [00:00<00:00, 27.47sent/s]Encoding:  47%|████▋     | 15/32 [00:00<00:00, 27.50sent/s]Encoding:  56%|█████▋    | 18/32 [00:00<00:00, 27.52sent/s]Encoding:  66%|██████▌   | 21/32 [00:00<00:00, 27.51sent/s]Encoding:  75%|███████▌  | 24/32 [00:00<00:00, 27.51sent/s]Encoding:  84%|████████▍ | 27/32 [00:00<00:00, 27.52sent/s]Encoding:  94%|█████████▍| 30/32 [00:01<00:00, 27.53sent/s]Encoding: 100%|██████████| 32/32 [00:01<00:00, 27.49sent/s]
+FT             0.4812   0.1136   0.1916   0.7695   0.5778
